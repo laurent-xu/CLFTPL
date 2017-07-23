@@ -1,11 +1,12 @@
 #define CLFCTPL_DEFINE_STOP
-#include "../../clftpl.hxx"
+
 #include <iostream>
-#include <boost/lockfree/queue.hpp>
+
+#include "clftpl.hxx"
+#include "queue.hxx"
 
 using func_t = std::function<void(int)>;
-using queue_type_t = boost::lockfree::queue<func_t*,
-                                            boost::lockfree::capacity<200>>;
+using queue_type_t = queue<func_t*>;
 static clfctpl::thread_pool<queue_type_t> tp(8);
 
 static int print(int id)
@@ -26,21 +27,21 @@ static int print2(int id, int remains)
 }
 
 // FIXME
-static int print3(int count)
-{
-  for (; count > 0; --count)
-    std::cout << "Count down " << count << " there are " << tp.n_waiting()
-              <<  " waiting threads" << std::endl;
-  //tp.push_no_index(print3, count);
-  return 0;
-}
+// static int print3(int count)
+// {
+//   for (; count > 0; --count)
+//     std::cout << "Count down " << count << " there are " << tp.n_waiting()
+//               <<  " waiting threads" << std::endl;
+//   //tp.push_no_index(print3, count);
+//   return 0;
+// }
 
 
-static int print4()
-{
-  std::cout << "Simple test" << std::endl;
-  return 0;
-}
+// static int print4()
+// {
+//   std::cout << "Simple test" << std::endl;
+//   return 0;
+// }
 
 
 int main()
@@ -68,7 +69,7 @@ int main()
   tp.push(print2, 77777);
 
   tp.stop();
-  std::cout << "The threadpool is stoped." << std::endl;
+  std::cout << "The threadpool is stopped." << std::endl;
 
   return 0;
 }
