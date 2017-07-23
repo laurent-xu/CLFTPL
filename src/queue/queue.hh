@@ -1,38 +1,42 @@
+#include <atomic>
 #include <cassert>
 #include <memory>
 
-template <typename T>
-class node;
+/*
+** lock-free queue using the algorithms described in "Simple, Fast and
+** Practical Non-Blocking and Blocking Concurrent Queue Algorithms", by
+** Michael, M. M. and Scott, M. L.
+*/
 
 template <typename T>
-using node_ptr = std::shared_ptr<node<T>>;
+struct node_t;
 
 template <typename T>
-class node
+struct ptr_t
 {
-public:
-  node(T elt)
-    : next_(nullptr), elt_(elt)
+  ptr_t(node_t<T>* node = nullptr, unsigned count = 0)
+    : ptr(node), count(count)
   {}
 
-  void set_next(node_ptr<T> next)
+  bool operator==(const ptr_t& o) const
   {
-    next_ = next;
+    return ptr == o.ptr && count == o.count;
   }
 
-  node_ptr<T> next()
-  {
-    return next_;
-  }
+  node_t<T>* ptr;
+  unsigned count = 0;
+};
 
-  T val()
-  {
-    return elt_;
-  }
+template <typename T>
+struct node_t
+{
+  node_t(T value = T())
+    : next(nullptr), value(value)
+  {}
 
-private:
-  node_ptr<T> next_;
-  T elt_;
+  std::atomic<ptr_t<T>> next;
+  int count;
+  T value;
 };
 
 template <typename T>
@@ -40,40 +44,78 @@ class queue
 {
 public:
   queue()
-    : head_(nullptr), tail_(nullptr)
-  {}
-
-  void push(T elt)
+    : q_head(ptr_t<T>()), q_tail(ptr_t<T>())
   {
-    auto new_node = std::make_shared<node<T>>(elt);
-    if (head_ == nullptr)
+    ptr_t<T> sentinel(new node_t<T>());
+    q_head.store(sentinel);
+    q_tail.store(sentinel);
+  }
+
+  void push(const T& elt)
+  {
+    node_t<T>* node = new node_t<T>(elt);
+    for (;;)
     {
-      assert(tail_ == nullptr);
-      head_ = new_node;
-      tail_ = head_;
-    }
-    else
-    {
-      tail_->set_next(new_node);
-      tail_ = new_node;
+      auto tail = q_tail.load(std::memory_order_acquire);
+      auto next = tail.ptr->next.load(std::memory_order_acquire);
+      if (tail == q_tail.load(std::memory_order_acquire))
+      {
+        if (next.ptr == nullptr)
+        {
+          ptr_t<T> new_tail_next(node, next.count + 1);
+          if (tail.ptr->next.compare_exchange_weak(next, new_tail_next))
+          {
+            ptr_t<T> new_tail(node, tail.count + 1);
+            q_tail.compare_exchange_strong(tail, new_tail);
+            break;
+          }
+        }
+        else
+        {
+          ptr_t<T> new_tail(next.ptr, tail.count + 1);
+          q_tail.compare_exchange_strong(tail, new_tail);
+        }
+      }
     }
   }
 
-  T pop()
+  bool pop(T& val)
   {
-    auto val = head_->val();
-    head_ = head_->next();
-    if (head_ == nullptr)
-      tail_ = nullptr;
-    return val;
+    for (;;)
+    {
+      auto head = q_head.load(std::memory_order_acquire);
+      auto tail = q_tail.load(std::memory_order_acquire);
+      auto next = head.ptr->next.load(std::memory_order_acquire);
+      if (head == q_head.load(std::memory_order_acquire))
+      {
+        if (head.ptr == tail.ptr)
+        {
+          if (next.ptr == nullptr)
+            return false;
+          ptr_t<T> new_tail(next.ptr, tail.count + 1);
+          q_tail.compare_exchange_strong(tail, new_tail);
+        }
+        else
+        {
+          val = next.ptr->value;
+          ptr_t<T> new_head(next.ptr, head.count + 1);
+          if (q_head.compare_exchange_weak(head, new_head))
+          {
+            free(head.ptr);
+            break;
+          }
+        }
+      }
+    }
+    return true;
   }
 
   bool empty()
   {
-    return head_ == nullptr;
+    return q_head.load().ptr == q_tail.load().ptr;
   }
 
 private:
-  node_ptr<T> head_;
-  node_ptr<T> tail_;
+  std::atomic<ptr_t<T>> q_head;
+  std::atomic<ptr_t<T>> q_tail;
 };
