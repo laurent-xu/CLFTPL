@@ -92,6 +92,7 @@ static void quicksort1_bench(benchmark::State& state)
 #if DEBUG
       print(data, size);
 #endif
+  delete data;
 }
 BENCHMARK(quicksort1_bench)->UseRealTime()->Unit(benchmark::kMicrosecond);
 
@@ -107,9 +108,9 @@ static void quicksort2_bench(benchmark::State& state)
       tp.push(quicksort, data, 0, size - 1, size);
       tp.wait();
     }
-
 #if DEBUG
       print(data, size);
 #endif
+  delete data;
 }
 // BENCHMARK(quicksort2_bench)->UseRealTime()->Unit(benchmark::kMicrosecond);
