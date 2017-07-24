@@ -1,20 +1,25 @@
 CXX= g++
-LDFLAGS=-lpthread -latomic
-CXXFLAGS=-Wall -Wextra -Wpedantic -Werror -std=c++14 -O0 -g -Isrc
+LDFLAGS=-lpthread -lbenchmark -latomic
+CXXFLAGS=-Wall -Wextra -Wpedantic -std=c++14 -O0 -g -Isrc
 
-BIN_TEST= test
-TEST_OBJ= quicksort.o
-TEST_OBJS = $(addprefix tests/, $(TEST_OBJ))
+# Add each test binary name here.
+BINS_TEST= quicksort
 
-check: $(BIN_TEST)
+# Do the same for each test.
+QUICK_OBJS = $(addprefix tests/, bench.o quicksort.o)
 
-$(BIN_TEST): $(TEST_OBJS)
-	$(LINK.cc) $^ -o $@
+# Do not forget to launch each binary test.
+bench: $(BINS_TEST)
+	./quicksort
+
+# Define the target rule for each test.
+quicksort: $(QUICK_OBJS)
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
 main: tests/main.cc
 	$(LINK.cc) $^ -o $@
 
 clean:
-	rm -rf $(BIN_TEST) $(TEST_OBJS)
+	rm -rf $(BINS_TEST) $(QUICK_OBJS)
 
-.PHONY: clean check
+.PHONY: clean
