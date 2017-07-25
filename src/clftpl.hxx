@@ -17,7 +17,8 @@ namespace clfctpl
       thread_pool(int n_threads) : n_threads_(n_threads) {init();}
       ~thread_pool()
       {
-        wait();
+        if (!is_done_)
+          wait();
       }
 
       int n_waiting()
@@ -74,7 +75,10 @@ namespace clfctpl
         while (!todo_queue_.empty())
           continue;
         while (n_working_ > 0)
+        {
           continue;
+        }
+        pause();
       }
 
 #ifdef CLFCTPL_DEFINE_STOP
@@ -92,12 +96,17 @@ namespace clfctpl
         init();
       }
 
-      void stop()
+      void stop(bool isWait = false)
       {
-        pause();
-        func_t* task;
-        while(todo_queue_.pop(task))
-          continue;
+        if (isWait)
+          wait();
+        else
+        {
+          pause();
+          func_t* task;
+          while(todo_queue_.pop(task))
+            continue;
+        }
       }
 #endif
 
@@ -105,6 +114,7 @@ namespace clfctpl
       void init()
       {
         threads_.reserve(n_threads_);
+        n_working_ = 0;
         for (int i = 0; i < n_threads_; ++i)
         {
           auto tmp = std::thread(thread_run, std::ref(todo_queue_), i,

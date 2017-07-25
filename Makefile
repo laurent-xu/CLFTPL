@@ -16,7 +16,7 @@ bench: benchmark/install $(BINS_TEST)
 quicksort: $(QUICK_OBJS)
 	$(CXX) $(CXXFLAGS) $^  $(LDFLAGS) -o $@
 
-main: tests/main.cc benchmark/install
+main: tests/main.cc
 	$(LINK.cc) $^ -o $@
 
 benchmark/install:

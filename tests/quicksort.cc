@@ -9,6 +9,8 @@
 #include "bench.hh"
 #include "../CTPL/ctpl_stl.h"
 #include "../src/clftpl.hxx"
+#include "thread_bomb.hh"
+#include "single_thread.hh"
 #include "../src/queue.hxx"
 
 /**********************************************************************
@@ -48,13 +50,16 @@ int partition(int* arr, const int left, const int right)
   return i - 1;
 }
 
-void quicksort(int id, int* arr, const int left, const int right, const int sz)
+template <typename Tp>
+int quicksort(int id, int* arr, const int left, const int right,
+              const int sz, Tp* tp)
 {
   if (left >= right)
-    return;
+    return id;
   int part = partition(arr, left, right);
-  quicksort(id, arr, left, part - 1, sz);
-  quicksort(id, arr, part + 1, right, sz);
+  tp->push(quicksort<Tp>, arr, left, part - 1, sz, tp);
+  tp->push(quicksort<Tp>, arr, part + 1, right, sz, tp);
+  return id;
 }
 
 
@@ -81,35 +86,43 @@ int* get_data()
   return data;
 }
 
-static void quicksort1_bench(benchmark::State& state)
+template <typename Tp>
+static void quicksort_bench(benchmark::State& state)
 {
   int* data = get_data();
   while (state.KeepRunning())
     {
-      ctpl::thread_pool p(2);
-      p.push(quicksort, data, 0, size - 1, size);
+      Tp tp(8);
+      tp.push(quicksort<Tp>, data, 0, size - 1, size, &tp);
     }
 #if DEBUG
       print(data, size);
 #endif
 }
-BENCHMARK(quicksort1_bench)->UseRealTime()->Unit(benchmark::kMicrosecond);
 
-// FIXME: Function does not end.
-static void quicksort2_bench(benchmark::State& state)
+static void quicksort_bench_ctpl(benchmark::State& state)
 {
-  int* data = get_data();
-  using func_t = std::function<void(int)>;
-  using queue_type_t = queue<func_t*>;
-  while (state.KeepRunning())
-    {
-      clfctpl::thread_pool<queue_type_t> tp(2);
-      tp.push(quicksort, data, 0, size - 1, size);
-      tp.wait();
-    }
-#if DEBUG
-      print(data, size);
-#endif
-  delete data;
+  return quicksort_bench<ctpl::thread_pool>(state);
 }
-//BENCHMARK(quicksort2_bench)->UseRealTime()->Unit(benchmark::kMicrosecond);
+
+static void quicksort_bench_single(benchmark::State& state)
+{
+  return quicksort_bench<single_thread::thread_pool>(state);
+}
+
+static void quicksort_bench_bomb(benchmark::State& state)
+{
+  return quicksort_bench<thread_bomb::thread_pool>(state);
+}
+
+static void quicksort_bench_clctpl(benchmark::State& state)
+{
+  using func_t = std::function<void(int)>;
+  using queue_t = queue<func_t*>;
+  return quicksort_bench<clfctpl::thread_pool<queue_t>>(state);
+}
+
+BENCHMARK(quicksort_bench_ctpl)->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_single)->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_bomb)->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clctpl)->UseRealTime()->Unit(benchmark::kMicrosecond);
