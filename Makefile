@@ -20,7 +20,7 @@ main: tests/main.cc
 	$(LINK.cc) $^ -o $@
 
 benchmark/install:
-	cd benchmark && cmake -DCMAKE_INSTALL_PREFIX:PATH=install . && make all install
+	cd benchmark && cmake cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=install . && make all install
 
 clean:
 	rm -rf $(BINS_TEST) $(QUICK_OBJS)
