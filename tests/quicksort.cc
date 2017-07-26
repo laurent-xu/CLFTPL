@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 #include <stdlib.h>
 #include <benchmark/benchmark.h>
 
@@ -25,6 +26,7 @@ void print(int* arr, int n)
         i++;
     }
   std::cout << "\n";
+  fflush(stdout);
 }
 
 int partition(int* arr, const int left, const int right)
@@ -70,52 +72,60 @@ int size = 1000000; // Size of array to use.
 int max_value = 1000000;
 
 // Use this to fill the data only once for both benchmark.
-int* get_data()
+std::unique_ptr<int[]>& get_data()
 {
-  static int* data = nullptr;
-  if (!data)
+  static std::unique_ptr<int[]> data(new int[size]);
+  static bool initialized = false;
+  if (!initialized)
     {
+      initialized = true;
       srand(42);
-      data = new int[size];
       for (int i=0; i < size; ++i)
         data[i] = (rand()%max_value)+1;
 #if DEBUG
-      print(data, size);
+      std::cerr << "Initializing array" << std::endl;
 #endif
     }
   return data;
 }
 
 template <typename Tp>
-static void quicksort_bench(benchmark::State& state)
+void quicksort_bench(benchmark::State& state)
 {
-  int* data = get_data();
+  // Copy data.
+  std::unique_ptr<int[]>& data = get_data();
+  int* data_cpy = new int[size];
+  memcpy(data_cpy, data.get(), sizeof(int) * size);
+#if DEBUG
+  print(data.get(), size);
+#endif
+
   while (state.KeepRunning())
     {
       Tp tp(8);
-      tp.push(quicksort<Tp>, data, 0, size - 1, size, &tp);
+      tp.push(quicksort<Tp>, data_cpy, 0, size - 1, size, &tp);
     }
 #if DEBUG
-      print(data, size);
+  print(data_cpy, size);
 #endif
 }
 
-static void quicksort_bench_ctpl(benchmark::State& state)
+void quicksort_bench_ctpl(benchmark::State& state)
 {
   return quicksort_bench<ctpl::thread_pool>(state);
 }
 
-static void quicksort_bench_single(benchmark::State& state)
+void quicksort_bench_single(benchmark::State& state)
 {
   return quicksort_bench<single_thread::thread_pool>(state);
 }
 
-static void quicksort_bench_bomb(benchmark::State& state)
+void quicksort_bench_bomb(benchmark::State& state)
 {
   return quicksort_bench<thread_bomb::thread_pool>(state);
 }
 
-static void quicksort_bench_clctpl(benchmark::State& state)
+void quicksort_bench_clctpl(benchmark::State& state)
 {
   using func_t = std::function<void(int)>;
   using queue_t = queue<func_t*>;

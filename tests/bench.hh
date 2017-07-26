@@ -3,11 +3,8 @@
 #pragma once
 
 /**
-** Benchmark of quicksort using CTPL library.
+** Quicksort function using arbitrary thread pool provided through Tp.
 */
-static void quicksort1_bench(benchmark::State& state);
 
-/**
-** Benchmark of quicksort using CTPL library.
-*/
-//static void quicksort2_bench(benchmark::State& state);
+template<typename Tp>
+void quicksort_bench(benchmark::State& state);
