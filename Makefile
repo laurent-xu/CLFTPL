@@ -16,6 +16,12 @@ bench: benchmark/install $(BINS_TEST)
 quicksort: $(QUICK_OBJS)
 	$(CXX) $(CXXFLAGS) $^  $(LDFLAGS) -o $@
 
+# Do the same for each test.
+MK_OBJS=$(addprefix tests/, minimake.o)
+
+minimake: $(MK_OBJS)
+	$(CXX) $(CXXFLAGS) $^  $(LDFLAGS) -o $@
+
 main: tests/main.cc
 	$(LINK.cc) $^ -o $@
 

@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include <iostream>
+#define CLFCTPL_DEFINE_STOP
 
 namespace clfctpl
 {
