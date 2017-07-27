@@ -78,7 +78,9 @@ namespace clfctpl
         {
           continue;
         }
+#ifdef CLFCTPL_DEFINE_STOP
         pause();
+#endif
       }
 
 #ifdef CLFCTPL_DEFINE_STOP
