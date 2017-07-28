@@ -117,18 +117,18 @@ void quicksort_bench_bomb(benchmark::State& state)
   return quicksort_bench<thread_bomb::thread_pool>(state);
 }
 
-void quicksort_bench_clctpl(benchmark::State& state)
+void quicksort_bench_clftpl(benchmark::State& state)
 {
   using func_t = std::function<void(int)>;
   using queue_t = queue<func_t*>;
   return quicksort_bench<clfctpl::thread_pool<queue_t>>(state);
 }
 
-BENCHMARK(quicksort_bench_ctpl)->RangeMultiplier(2)->Range(8, 8<<10) \
+BENCHMARK(quicksort_bench_ctpl)->RangeMultiplier(2)->Range(8, 8<<15) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_single)->RangeMultiplier(2)->Range(8, 8<<10) \
+BENCHMARK(quicksort_bench_single)->RangeMultiplier(2)->Range(8, 8<<15) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_bomb)->RangeMultiplier(2)->Range(8, 8<<10) \
+BENCHMARK(quicksort_bench_bomb)->RangeMultiplier(2)->Range(8, 8<<15) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_clctpl)->RangeMultiplier(2)->Range(8, 8<<10) \
+BENCHMARK(quicksort_bench_clftpl)->RangeMultiplier(2)->Range(8, 8<<15) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
