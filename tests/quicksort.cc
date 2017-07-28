@@ -1,5 +1,6 @@
 #define CLFCTPL_DEFINE_STOP
 #define DEBUG 0
+#define THREAD_NB 11
 
 #include <iostream>
 #include <algorithm>
@@ -8,7 +9,7 @@
 #include <benchmark/benchmark.h>
 
 #include "bench.hh"
-#include "../CTPL/ctpl_stl.h"
+#include "../CTPL/ctpl.h"
 #include "../src/clftpl.hxx"
 #include "thread_bomb.hh"
 #include "single_thread.hh"
@@ -94,7 +95,7 @@ void quicksort_bench(benchmark::State& state)
 #endif
   while (state.KeepRunning())
     {
-      Tp tp(8);
+      Tp tp(THREAD_NB);
       tp.push(quicksort<Tp>, data.get(), 0, size - 1, size, &tp);
     }
 #if DEBUG
@@ -124,11 +125,78 @@ void quicksort_bench_clftpl(benchmark::State& state)
   return quicksort_bench<clfctpl::thread_pool<queue_t>>(state);
 }
 
-BENCHMARK(quicksort_bench_ctpl)->RangeMultiplier(2)->Range(8, 8<<15) \
+BENCHMARK(quicksort_bench_ctpl)->RangeMultiplier(2)->Range(8, 8<<16) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_single)->RangeMultiplier(2)->Range(8, 8<<15) \
+BENCHMARK(quicksort_bench_single)->RangeMultiplier(2)->Range(8, 8<<16) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_bomb)->RangeMultiplier(2)->Range(8, 8<<15) \
+BENCHMARK(quicksort_bench_bomb)->RangeMultiplier(2)->Range(8, 8<<16) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_clftpl)->RangeMultiplier(2)->Range(8, 8<<15) \
+BENCHMARK(quicksort_bench_clftpl)->RangeMultiplier(2)->Range(8, 8<<16) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
+
+/*
+BENCHMARK(quicksort_bench_clftpl)->Arg(1) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(2) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(3) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(4) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(5) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(6) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(7) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(8) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(9) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(10) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(11) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(12) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(13) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(14) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(15) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(16) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(17) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(18) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(19) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(20) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(21) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(22) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(23) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(24) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(25) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(26) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(27) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(28) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(29) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(30) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(31) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clftpl)->Arg(32) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+*/

@@ -1,0 +1,36 @@
+./quicksort
+---------------------------------------------------------------------------
+Benchmark                                    Time           CPU Iterations
+---------------------------------------------------------------------------
+[0;32mquicksort_bench_clftpl/1/real_time  [m[0;33m   1058145 us    1058130 us [m[0;36m         1[m
+[m[0;32mquicksort_bench_clftpl/2/real_time  [m[0;33m    644991 us     644984 us [m[0;36m         1[m
+[m[0;32mquicksort_bench_clftpl/3/real_time  [m[0;33m    431596 us     431578 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/4/real_time  [m[0;33m    361428 us     361333 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/5/real_time  [m[0;33m    313378 us     313347 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/6/real_time  [m[0;33m    289704 us     270518 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/7/real_time  [m[0;33m    252821 us     252744 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/8/real_time  [m[0;33m    256398 us     237420 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/9/real_time  [m[0;33m    261796 us     248293 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/10/real_time [m[0;33m    250867 us     210733 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/11/real_time [m[0;33m    243351 us     141459 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/12/real_time [m[0;33m    257354 us     132392 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/13/real_time [m[0;33m    247564 us     107761 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/14/real_time [m[0;33m    254636 us     129943 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/15/real_time [m[0;33m    257498 us      93895 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/16/real_time [m[0;33m    246385 us     105253 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/17/real_time [m[0;33m    259399 us     103788 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/18/real_time [m[0;33m    245224 us      85891 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/19/real_time [m[0;33m    259781 us     110803 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/20/real_time [m[0;33m    262857 us     128892 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/21/real_time [m[0;33m    253020 us     121602 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/22/real_time [m[0;33m    252892 us      81386 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/23/real_time [m[0;33m    254034 us      68728 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/24/real_time [m[0;33m    272626 us      79790 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/25/real_time [m[0;33m    276285 us      67274 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/26/real_time [m[0;33m    282948 us     111325 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/27/real_time [m[0;33m    283081 us      53033 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/28/real_time [m[0;33m    262697 us      51891 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/29/real_time [m[0;33m    253117 us      80570 us [m[0;36m         3[m
+[m[0;32mquicksort_bench_clftpl/30/real_time [m[0;33m    271283 us      44244 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/31/real_time [m[0;33m    289482 us      50992 us [m[0;36m         2[m
+[m[0;32mquicksort_bench_clftpl/32/real_time [m[0;33m    276244 us      44372 us [m[0;36m         2[m
