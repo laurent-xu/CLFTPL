@@ -13,15 +13,24 @@
 #include "../src/queue.hxx"
 #include "../src/task_scheduler.hxx"
 #include "../src/clftpl.hxx"
+#include <benchmark/benchmark.h>
+#include "../CTPL/ctpl_stl.h"
+#include "single_thread.hh"
 using func_t = std::function<void(int)>;
 using queue_t = queue<func_t*>;
-using TP = clfctpl::thread_pool<queue_t>;
-using TS = task_scheduler<std::string, TP>;
+// using TP = clfctpl::thread_pool<queue_t>;
+using TP = ctpl::thread_pool;
+template <typename T>
+using TS = task_scheduler<std::string, T>;
 
 #define DEBUG
 
 struct Target
 {
+    Target(const std::string& name, std::vector<std::string>& commands,
+           std::vector<std::string>& dependencies)
+      : name(name), commands(commands), dependencies(dependencies)
+    {}
     std::string name;
     std::vector<std::string> commands;
     std::vector<std::string> dependencies;
@@ -84,7 +93,7 @@ static Target parse_target(const std::string& first_line, std::ifstream& infile)
         else
             break;
     }
-    return {target_name, commands, dependencies};
+    return Target(target_name, commands, dependencies);
 }
 
 void exec(const std::string& str)
@@ -107,6 +116,7 @@ int test()
     return 0;
 }
 
+template <typename TS>
 static void make_run(const std::string& target, std::unordered_map<std::string, Target>& targets, TS& ts)
 {
     ts.add_group(target);
@@ -129,10 +139,11 @@ static void make_run(const std::string& target, std::unordered_map<std::string, 
     }
 }
 
-int main(int argc, char* argv[])
+template <typename TS>
+void minimake(benchmark::State& state)
 {
     std::string line;
-    std::ifstream infile("Makefile");
+    std::ifstream infile("make/Makefile");
     std::unordered_map<std::string, Target> targets;
 
     while (std::getline(infile, line))
@@ -144,11 +155,48 @@ int main(int argc, char* argv[])
         }
     }
 
-    if (argc != 2)
-        std::cerr << "bad usage" << std::endl;
-
-    TS ts(8);
-    make_run(argv[1], targets, ts);
-    ts.run();
-    return 0;
+    while (state.KeepRunning())
+    {
+      TS ts(state.range(0));
+      make_run("target1", targets, ts);
+      ts.run();
+    }
 }
+
+static void minimake_bench_ctpl(benchmark::State& state)
+{
+  minimake<TS<ctpl::thread_pool>>(state);
+}
+
+// static void minimake_bench_single(benchmark::State& state)
+// {
+//   minimake<TS<single_thread::thread_pool>>(state);
+// }
+
+// static void minimake_bench_bomb(benchmark::State& state)
+// {
+//   minimake<TS<ctpl::thread_pool>>(state);
+// }
+
+static void minimake_bench_clfctpl(benchmark::State& state)
+{
+  minimake<TS<clfctpl::thread_pool<queue_t>>>(state);
+}
+
+BENCHMARK(minimake_bench_ctpl)->UseRealTime()->Arg(1)->Arg(2)->Arg(3)->Arg(4)->Arg(5)->Arg(6) \
+    ->Arg(7)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13)->Arg(14) \
+    ->Arg(15)->Arg(16)->Unit(benchmark::kMicrosecond);
+
+// BENCHMARK(minimake_bench_single)->UseRealTime()->Arg(1)->Arg(2)->Arg(3)->Arg(4)->Arg(5)->Arg(6) \
+//     ->Arg(7)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13)->Arg(14) \
+//     ->Arg(15)->Arg(16)->Unit(benchmark::kMicrosecond);
+
+// BENCHMARK(minimake_bench_bomb)->UseRealTime()->Arg(1)->Arg(2)->Arg(3)->Arg(4)->Arg(5)->Arg(6) \
+//     ->Arg(7)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13)->Arg(14) \
+//     ->Arg(15)->Arg(16)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK(minimake_bench_clfctpl)->UseRealTime()->Arg(1)->Arg(2)->Arg(3)->Arg(4)->Arg(5)->Arg(6) \
+    ->Arg(7)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13)->Arg(14) \
+    ->Arg(15)->Arg(16)->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_MAIN()

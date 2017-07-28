@@ -20,6 +20,8 @@ namespace thread_bomb
         return f_;
       }
 
+      void stop(bool) {}
+
       template <class Function>
       std::future<typename std::result_of<Function(int)>::type>
       push(Function&& f)

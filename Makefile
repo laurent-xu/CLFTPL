@@ -3,14 +3,15 @@ LDFLAGS=-Lbenchmark/install/lib/ -lpthread -lbenchmark -latomic
 CXXFLAGS=-Wall -Wextra -Wpedantic -std=c++14 -O0 -g -Isrc -Ibenchmark/install/include/
 
 # Add each test binary name here.
-BINS_TEST=quicksort
+BINS_TEST=minimake
 
 # Do the same for each test.
-QUICK_OBJS=$(addprefix tests/, bench.o quicksort.o)
+QUICK_OBJS=$(addprefix tests/, quicksort.o)
 
 # Do not forget to launch each binary test.
 bench: benchmark/install $(BINS_TEST)
-	./quicksort
+	$(CXX) make/main.cc
+	./minimake
 
 # Define the target rule for each test.
 quicksort: $(QUICK_OBJS)

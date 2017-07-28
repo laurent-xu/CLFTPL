@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <benchmark/benchmark.h>
 
-#include "bench.hh"
 #include "../CTPL/ctpl_stl.h"
 #include "../src/clftpl.hxx"
 #include "thread_bomb.hh"
@@ -132,3 +131,5 @@ BENCHMARK(quicksort_bench_bomb)->RangeMultiplier(2)->Range(8, 8<<15) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
 BENCHMARK(quicksort_bench_clftpl)->RangeMultiplier(2)->Range(8, 8<<15) \
     ->UseRealTime()->Unit(benchmark::kMicrosecond);
+
+BENCHMARK_MAIN()
