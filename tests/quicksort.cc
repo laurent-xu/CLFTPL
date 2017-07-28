@@ -68,42 +68,34 @@ int quicksort(int id, int* arr, const int left, const int right,
 /**********************************************************************
                              Benchmark
 **********************************************************************/
-int size = 1000000; // Size of array to use.
 int max_value = 1000000;
 
 // Use this to fill the data only once for both benchmark.
-std::unique_ptr<int[]>& get_data()
+std::unique_ptr<int[]> get_data(int sz)
 {
-  static std::unique_ptr<int[]> data(new int[size]);
-  static bool initialized = false;
-  if (!initialized)
-    {
-      initialized = true;
-      srand(42);
-      for (int i=0; i < size; ++i)
-        data[i] = (rand()%max_value)+1;
+  std::unique_ptr<int[]> data(new int[sz]);
+  srand(42);
+  for (int i=0; i < sz; ++i)
+    data[i] = (rand()%max_value)+1;
 #if DEBUG
-      std::cerr << "Initializing array" << std::endl;
+  std::cerr << "Initializing array" << std::endl;
 #endif
-    }
   return data;
 }
 
 template <typename Tp>
 void quicksort_bench(benchmark::State& state)
 {
-  // Copy data.
-  std::unique_ptr<int[]>& data = get_data();
-  int* data_cpy = new int[size];
-  memcpy(data_cpy, data.get(), sizeof(int) * size);
+  // Get data.
+  int size = state.range(0);
+  std::unique_ptr<int[]> data = get_data(size);
 #if DEBUG
   print(data.get(), size);
 #endif
-
   while (state.KeepRunning())
     {
       Tp tp(8);
-      tp.push(quicksort<Tp>, data_cpy, 0, size - 1, size, &tp);
+      tp.push(quicksort<Tp>, data.get(), 0, size - 1, size, &tp);
     }
 #if DEBUG
   print(data_cpy, size);
@@ -132,7 +124,11 @@ void quicksort_bench_clctpl(benchmark::State& state)
   return quicksort_bench<clfctpl::thread_pool<queue_t>>(state);
 }
 
-BENCHMARK(quicksort_bench_ctpl)->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_single)->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_bomb)->UseRealTime()->Unit(benchmark::kMicrosecond);
-BENCHMARK(quicksort_bench_clctpl)->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_ctpl)->RangeMultiplier(2)->Range(8, 8<<10) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_single)->RangeMultiplier(2)->Range(8, 8<<10) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_bomb)->RangeMultiplier(2)->Range(8, 8<<10) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
+BENCHMARK(quicksort_bench_clctpl)->RangeMultiplier(2)->Range(8, 8<<10) \
+    ->UseRealTime()->Unit(benchmark::kMicrosecond);
